@@ -1,0 +1,6 @@
+apiVersion: v2
+name: rechnungspost
+description: Rechnungspost — XRechnung/ZUGFeRD invoice processing platform
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

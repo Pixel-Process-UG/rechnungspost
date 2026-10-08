@@ -1,0 +1,76 @@
+replicaCount: 2
+
+image:
+  repository: ghcr.io/pixel-process-ug/rechnungspost-api
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: api.rechnungspost.de
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: rechnungspost-api-tls
+      hosts:
+        - api.rechnungspost.de
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+env:
+  APP_ENV: production
+  DB_CONNECTION: pgsql
+  CACHE_STORE: redis
+  QUEUE_CONNECTION: redis
+  SESSION_DRIVER: redis
+  AWS_USE_PATH_STYLE_ENDPOINT: "true"
+  AWS_DEFAULT_REGION: eu-central-1
+
+secrets:
+  APP_KEY: ""
+  DB_HOST: ""
+  DB_DATABASE: rechnungspost
+  DB_USERNAME: rechnungspost
+  DB_PASSWORD: ""
+  REDIS_HOST: ""
+  SENTRY_LARAVEL_DSN: ""
+  AWS_ACCESS_KEY_ID: ""
+  AWS_SECRET_ACCESS_KEY: ""
+  AWS_BUCKET: rechnungspost
+  AWS_ENDPOINT: ""
+
+migration:
+  enabled: true
+  image:
+    repository: ghcr.io/pixel-process-ug/rechnungspost-api
+    tag: "latest"
